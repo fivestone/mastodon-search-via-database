@@ -21,7 +21,7 @@
                 <label>UserName: </label><input type="text" name="user_email" /><br /><br />
                 <label>Password: </label><input type="password" name="user_password" /><br/><br />
                 <img src="checkcode.php"  onclick="this.src='checkcode.php?'+new Date().getTime();" width="200" height="80"><br/>
-                <label>验证码: </label><input type="text" name="checkcode"><br/>
+                <label>Checkcode: </label><input type="text" name="checkcode"><br/>
                 <input type="submit" value=" Submit " /><br />
             </form>
 </div>
