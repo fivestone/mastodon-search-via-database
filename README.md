@@ -6,7 +6,7 @@ A simple PHP shell that searches toots directly from the mastodon database via S
 
 Mastodon's elastic search costs a huge amount of additional memory but does not work well, especially for non-latin characters. Thus, as a single-user instance, I would rather search directly in the database, then write a simple page for that.
 
-I have considered to make it suitable for small instances that contain more than one user, but rapidly realized that's a bad idea. It seems not possible to replicate the complex permission control of Mastodon into this PHP page, so I give up. It is strongly NOT recommended to open this program to any non-admin users. Actually, it should NOT be used on any instance which has more than one user.
+I have considered to make it suitable for small instances that contain more than one user, but rapidly realized that's a bad idea. It seems not possible to replicate the complex permission control of Mastodon into this PHP page, so I give up. It is strongly **NOT recommended** to open this program to any non-admin users. Actually, it should **NOT be used** on any instance which has more than one user.
 
 ## Getting Started
 
