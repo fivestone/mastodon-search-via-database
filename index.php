@@ -35,15 +35,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     {
         $search_types = "all";
     }
-    $search_types_sql = match ($search_types) {
-        'all' => "and s.visibility<=1",
-        'mine' => "and s.account_id=" . $_SESSION['account_id'],
-        'following' => "and s.visibility<=2 and account_id in (select target_account_id FROM follows where follows.account_id=" . $_SESSION['account_id'] . ")",
-        'local' => "and s.visibility<=1 and s.local is true",
-        'to_me' => "and s.in_reply_to_account_id=" . $_SESSION['account_id'],
-        'favourites' => "and exists (select * from favourites f where f.account_id=" . $_SESSION['account_id'] . " and f.status_id =s.id)",
-        default => "and s.visibility<=1",
-    };
+
+    $search_types_sql = "";
+    switch ($search_types)
+    {
+        case 'all':
+            $search_types_sql = "and s.visibility<=1";
+            break;
+        case 'mine':
+            $search_types_sql = "and s.account_id=" . $_SESSION['account_id'];
+            break;
+        case 'following':
+            $search_types_sql = "and s.visibility<=2 and account_id in (select target_account_id FROM follows where follows.account_id=" . $_SESSION['account_id'] . ")";
+            break;
+        case 'local':
+            $search_types_sql = "and s.visibility<=1 and s.local is true";
+            break;
+        case 'to_me':
+            $search_types_sql = "and s.in_reply_to_account_id=" . $_SESSION['account_id'];
+            break;
+        case 'favourites':
+            $search_types_sql = "and exists (select * from favourites f where f.account_id=" . $_SESSION['account_id'] . " and f.status_id =s.id)";
+            break;
+        default:
+            $search_types_sql = "and s.visibility<=1";
+    }
 
     $attach_sql = "";
     if($_POST['only_reply']=="1")
