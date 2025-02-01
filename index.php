@@ -11,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     foreach ($search_words_array as $search_words_1) {
         if ($search_words_1 != '') {
-            $search_words_sql = $search_words_sql . " and text like '%" . $search_words_1 . "%'";
+            $search_words_sql = $search_words_sql . " and (text like '%" . $search_words_1 . "%' or spoiler_text like '%" . $search_words_1 . "%')";
         }
     }
 
@@ -94,59 +94,85 @@ EOF;
 }
 ?>
 
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <meta http-equiv="Content-Language" content="zh-cn">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Mastodon Query</title>
-
-    <style>a{TEXT-DECORATION:none;}</style>
-
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search</title>
+    <link href="./css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-<div>
-    <?php echo $_SESSION['account_name']; ?> - <a href="logout.php">logout</a><hr>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <form action="index.php" method="post" class="border p-4 bg-light">
+                <div class="form-group">
+                    <label for="logout"><?php echo $_SESSION['account_name']; ?> - <a href="logout.php">logout</a><?php // echo ' - ' + $sql; ?></label>
+                </div>
+                <div class="form-group">
+                    <label for="search_words">Search Words:</label>
+                    <input type="text" class="form-control" id="search_words" name="search_words" value="<?php echo $search_words; ?>"> separate keywords with space
+                </div>
+                <div class="form-group">
+                    <label for="date_start">Start Date:</label>
+                    <input type="date" class="form-control" id="date_start" name="date_start" value="<?=$_POST['date_start'] ?>">
+                </div>
+                <div class="form-group">
+                    <label for="date_end">End Date:</label>
+                    <input type="date" class="form-control" id="date_end" name="date_end" value="<?=$_POST['date_end'] ?>">
+                </div>
+                <div class="form-group">
+                    <label for="time_order">Time Order:</label>
+                    <select class="form-control" id="time_order" name="time_order">
+                        <option value="asc" <?php if($_POST['time_order']=="asc") {echo "selected";} ?>>Ascending</option>
+                        <option value="desc" <?php if($_POST['time_order']!="asc") {echo "selected";} ?>>Descending</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="search_types">Search Types:</label><br>
+                    <input type="radio" name="search_types" value="all" <?php if($_POST['search_types']=="" || $_POST['search_types']=="all") {echo "checked";} ?>>all
+                    <input type="radio" name="search_types" value="mine" <?php if($_POST['search_types']=="mine") {echo "checked";} ?>>mine
+                    <input type="radio" name="search_types" value="following" <?php if($_POST['search_types']=="following") {echo "checked";} ?>>following
+                    <input type="radio" name="search_types" value="local" <?php if($_POST['search_types']=="local") {echo "checked";} ?>>local
+                    <input type="radio" name="search_types" value="to_me" <?php if($_POST['search_types']=="to_me") {echo "checked";} ?>>to me
+                    <input type="radio" name="search_types" value="favourites" <?php if($_POST['search_types']=="favourites") {echo "checked";} ?>>favourites
+                    <input type="radio" disabled name="search_types" value="rt" <?php if($_POST['search_types']=="favourites") {echo "checked";} ?>>my RT
+                </div>
+                <div class="form-group">
+                    <label for="attach_sql">Attachments:</label><br>
+                    <input type="checkbox" name="only_reply" value="1" <?php if($_POST['only_reply']=="1") {echo "checked";} ?>>only reply
+                    <input type="checkbox" name="no_reply" value="1" <?php if($_POST['no_reply']=="1") {echo "checked";} ?>>no reply
+                    <input type="checkbox" name="has_media" value="1" <?php if($_POST['has_media']=="1") {echo "checked";} ?>>media
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Search</button>
+            </form>
+        </div>
+    </div>
 </div>
-<form method="post">
-    <input type="text" maxlength="50" id="search_words" name="search_words" value="<?php echo $search_words; ?>"> separate keywords with space<br />
-    from <input type="date" name="date_start" value="<?=$_POST['date_start'] ?>"> to <input type="date" name="date_end" value="<?=$_POST['date_end'] ?>">
-    <select name="time_order" >
-        <option value="desc" <?php if($_POST['time_order']!="asc") {echo "selected";} ?>>newer first</option>
-        <option value="asc" <?php if($_POST['time_order']=="asc") {echo "selected";} ?>>older first</option>
-    </select>
-    <br/>
 
-    <input type="radio" name="search_types" value="all" <?php if($_POST['search_types']=="" || $_POST['search_types']=="all") {echo "checked";} ?>>all
-    <input type="radio" name="search_types" value="mine" <?php if($_POST['search_types']=="mine") {echo "checked";} ?>>mine
-    <input type="radio" name="search_types" value="following" <?php if($_POST['search_types']=="following") {echo "checked";} ?>>following
-    <input type="radio" name="search_types" value="local" <?php if($_POST['search_types']=="local") {echo "checked";} ?>>local
-    <input type="radio" name="search_types" value="to_me" <?php if($_POST['search_types']=="to_me") {echo "checked";} ?>>to me
-    <input type="radio" name="search_types" value="favourites" <?php if($_POST['search_types']=="favourites") {echo "checked";} ?>>favourites
-    <input type="radio" disabled name="search_types" value="rt" <?php if($_POST['search_types']=="favourites") {echo "checked";} ?>>my RT
-    <br/>
-    <input type="checkbox" name="only_reply" value="1" <?php if($_POST['only_reply']=="1") {echo "checked";} ?>>only reply
-    <input type="checkbox" name="no_reply" value="1" <?php if($_POST['no_reply']=="1") {echo "checked";} ?>>no reply
-    <input type="checkbox" name="has_media" value="1" <?php if($_POST['has_media']=="1") {echo "checked";} ?>>media
-    <br/>
-    <input type="submit" />
-</form>
-<div>
-    <?php
+<div class="container mt-5">
+<?php
     while($row = pg_fetch_row($search_result))
     {
         $internal_url = "https://".$INSTANCE_DOMAIN."/web/".$row[5]."/".$row[6];
     ?>
-<hr>
-        <p>
-            <?=$row[2] ?> <a href="<?=$internal_url ?>">⎋</a> <?=$row[5] ?> <a href="<?=$row[1] ?>">🔗</a><br />
+    <div class="card mb-3">
+        <div class="card-body">
+            <p class="card-text">
+            <?=$row[2] ?> <a href="<?=$internal_url ?>">⎋</a> <?=$row[5] ?> <a href="<?=$row[1] ?>">🔗</a><br>
             <?=$row[3] ?>
-        </p>
+            </p>
+        </div>
+    </div>
     <?php
     }
     ?>
 </div>
 
+
+<script src="./js/jquery-3.5.1.min.js"></script>
+<script src="./js/popper.min.js"></script>
+<script src="./js/bootstrap.min.js"></script>
 </body>
 </html>
-
